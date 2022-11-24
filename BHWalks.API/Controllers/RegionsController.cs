@@ -29,25 +29,26 @@ namespace BHWalks.API.Controllers
             var regions = await _regionsRepository.GetAll();
 
             //return DTO regions
-            var regionsDTO = new List<Models.DTO.Region>();
+            //var regionsDTO = new List<Models.DTO.Region>();
 
-            foreach (var region in regions)
-            {
-                var regionDTO = new Models.DTO.Region()
-                {
-                    Id = region.Id,
-                    Name = region.Name,
-                    RegionCode = region.RegionCode,
-                    Area = region.Area,
-                    Latitude = region.Latitude,
-                    Longitude = region.Longitude,
-                    Population = region.Population
-                };
-                regionsDTO.Add(regionDTO);
-            }
+            //foreach (var region in regions)
+            //{
+            //    var regionDTO = new Models.DTO.Region()
+            //    {
+            //        Id = region.Id,
+            //        Name = region.Name,
+            //        RegionCode = region.RegionCode,
+            //        Area = region.Area,
+            //        Latitude = region.Latitude,
+            //        Longitude = region.Longitude,
+            //        Population = region.Population
+
+            //    };
+            //    regionsDTO.Add(regionDTO);
+            //}
 
             //using AutoMapper
-            //var regionsDTO = _mapper.Map<List<Models.DTO.Region>>(regions);
+            var regionsDTO = _mapper.Map<List<Models.DTO.Region>>(regions);
 
             return Ok(regionsDTO);
         }
@@ -68,7 +69,7 @@ namespace BHWalks.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddRegion(Models.DTO.RequestedRegion requestedRegion)
+        public async Task<IActionResult> AddRegion(Models.DTO.addRegionRequest requestedRegion)
         {
             //convert requestedRegion to Models.Domain.Region 
             var region = new Models.Domain.Region()
@@ -125,7 +126,7 @@ namespace BHWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateRegion(Guid id, Models.DTO.RequestedRegion requestedRegion)
+        public async Task<IActionResult> UpdateRegion(Guid id, Models.DTO.addRegionRequest requestedRegion)
         {
             var regionDomain = new Models.Domain.Region()
             {                

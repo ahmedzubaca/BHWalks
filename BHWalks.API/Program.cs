@@ -2,6 +2,7 @@ using BHWalks.API.Data;
 using BHWalks.API.Repositories;
 using BHWalks.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,10 @@ builder.Services.AddDbContext<BHWalksDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BHWalksConnStr"));
 });
 builder.Services.AddScoped<IRegionsRepository, RegionsRepository>();
+builder.Services.AddScoped<IWalksRepository, WalksRepository>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddControllersWithViews()
+                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 var app = builder.Build();
 

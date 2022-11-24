@@ -17,7 +17,9 @@ namespace BHWalks.API.Repositories
 
         public async Task<IEnumerable<Region>> GetAll()
         {
-            return await _db.Regions.ToListAsync();
+            return await _db.Regions
+                .Include(x => x.Walks)
+                .ToListAsync();
         }
 
         public async Task<Region> GetRegion(Guid id)

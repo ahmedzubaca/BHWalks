@@ -1,6 +1,6 @@
 ﻿namespace BHWalks.API.Models.DTO
 {
-    public class RequestedRegion
+    public class addRegionRequest
     {
         public string RegionCode { get; set; }
         public string Name { get; set; }
