@@ -4,7 +4,10 @@ using BHWalks.API.Models.Domain;
 using BHWalks.API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Identity.Client;
+using System.Web.Http.ModelBinding;
+
 
 namespace BHWalks.API.Controllers
 {
@@ -69,8 +72,12 @@ namespace BHWalks.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddRegion(Models.DTO.addRegionRequest requestedRegion)
+        public async Task<IActionResult> AddRegion(Models.DTO.AddRegionRequest requestedRegion)
         {
+            if (!ValidateRegionModel(requestedRegion))
+            {
+                return BadRequest(ModelState);
+            }
             //convert requestedRegion to Models.Domain.Region 
             var region = new Models.Domain.Region()
             {
@@ -126,8 +133,12 @@ namespace BHWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateRegion(Guid id, Models.DTO.addRegionRequest requestedRegion)
+        public async Task<IActionResult> UpdateRegion(Guid id, Models.DTO.AddRegionRequest requestedRegion)
         {
+            if(!ValidateRegionModel(requestedRegion))
+            {
+                return BadRequest(ModelState);
+            }
             var regionDomain = new Models.Domain.Region()
             {                
                 Name = requestedRegion.Name,
@@ -155,5 +166,49 @@ namespace BHWalks.API.Controllers
             };
             return Ok(regionDTO);
         }
-    }
+        
+       
+        #region Validation methods
+
+        private bool ValidateRegionModel(Models.DTO.AddRegionRequest requestedRegion)
+        {
+            if (requestedRegion == null)
+            {
+                ModelState.AddModelError(nameof(requestedRegion),
+                    "Data are required");
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(requestedRegion.Name))
+            {
+                ModelState.AddModelError(nameof(requestedRegion.Name),
+                    $"{nameof(requestedRegion.Name)} cannot be empty or white space");
+            }
+
+            if (string.IsNullOrWhiteSpace(requestedRegion.RegionCode))
+            {
+                ModelState.AddModelError(nameof(requestedRegion.RegionCode),
+                    $"{nameof(requestedRegion.RegionCode)} cannot be empty or white space");
+            }
+
+            if (requestedRegion.Area <= 0)
+            {
+                ModelState.AddModelError(nameof(requestedRegion.Area),
+                    $"{nameof(requestedRegion.Area)} cannot be less or equal to zero");
+            }           
+
+            if(requestedRegion.Population < 0) {
+                ModelState.AddModelError(nameof(requestedRegion.Population),
+                    $"{nameof(requestedRegion.Population)} cannot be les than zero");
+            }
+
+            if (ModelState.ErrorCount > 0)
+            {
+                return false;
+            }
+
+            return true;
+        }        
+
+        #endregion
+    }    
 }

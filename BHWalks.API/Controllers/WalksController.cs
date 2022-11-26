@@ -12,12 +12,19 @@ namespace BHWalks.API.Controllers
     public class WalksController : ControllerBase
     {
         private readonly IWalksRepository _walksRepository;
+        private readonly IRegionsRepository _regionRepository;
+        private readonly IWalkDifficultiesRepository _walkDifficultiesRepository;
         private readonly IMapper _mapper;
 
-        public WalksController(IWalksRepository walksRepository, IMapper mapper)
+        public WalksController(IWalksRepository walksRepository,
+                               IRegionsRepository regionsRepository,
+                               IWalkDifficultiesRepository walkDifficultiesRepository,
+                               IMapper mapper)
         {
-            _walksRepository = walksRepository;
-            _mapper = mapper;           
+            _walksRepository = walksRepository;            
+            _regionRepository = regionsRepository;
+            _walkDifficultiesRepository = walkDifficultiesRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -44,8 +51,12 @@ namespace BHWalks.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddWalk(Models.DTO.addWalkRequest addWalkRequest)
+        public async Task<IActionResult> AddWalk(Models.DTO.AddWalkRequest addWalkRequest)
         {
+            if (!await ValidateWalkModel(addWalkRequest))
+            {
+                return BadRequest(ModelState);
+            }
             //convert DTO to Domain object
             var walkDomain = new Models.Domain.Walk()
             {
@@ -89,8 +100,12 @@ namespace BHWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateWalk(Guid id, Models.DTO.addWalkRequest walkRequest)
+        public async Task<IActionResult> UpdateWalk(Guid id, Models.DTO.AddWalkRequest walkRequest)
         {
+            if (!await ValidateWalkModel(walkRequest))
+            {
+                return BadRequest(ModelState);
+            }
             //convert DTO to Domain object
             var walkDomain = new Models.Domain.Walk()
             {                
@@ -119,6 +134,47 @@ namespace BHWalks.API.Controllers
             //Return response
             return CreatedAtAction(nameof(GetWalkById), new {id=walkDTO.Id}, walkDTO);
         }
+
+        #region Validation of Walk Model
+        private async Task<bool> ValidateWalkModel(Models.DTO.AddWalkRequest addWalkRequest)
+        {
+            if(addWalkRequest == null)
+            {
+                ModelState.AddModelError(nameof(addWalkRequest),
+                    "Model object cannot be empty!");
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(addWalkRequest.Name))
+            {
+                ModelState.AddModelError(nameof(addWalkRequest.Name),
+                    $"{nameof(addWalkRequest.Name)}, cannot be empty!");
+            }
+            if(addWalkRequest.Length <= 0)
+            {
+                ModelState.AddModelError(nameof(addWalkRequest.Length),
+                    $"{nameof(addWalkRequest.Length)} cannot be less than zero!");
+            }
+            var region = await _regionRepository.GetRegion(addWalkRequest.RegionId);
+            if (region == null)
+            {
+                ModelState.AddModelError(nameof(addWalkRequest.RegionId),
+                   $"{nameof(addWalkRequest.RegionId)} is invalid!");
+            }
+            var walkDiff = await _walkDifficultiesRepository.GetWalkDiffById(addWalkRequest.WalkDifficultyId);
+            if (walkDiff == null)
+            {
+                ModelState.AddModelError(nameof(addWalkRequest.WalkDifficultyId),
+                   $"{nameof(addWalkRequest.WalkDifficultyId)} is invalid!");
+            }
+
+            if(ModelState.ErrorCount > 0)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        #endregion
     }
 }
 

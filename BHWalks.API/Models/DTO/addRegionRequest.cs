@@ -1,7 +1,9 @@
-﻿namespace BHWalks.API.Models.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BHWalks.API.Models.DTO
 {
-    public class addRegionRequest
-    {
+    public class AddRegionRequest
+    {        
         public string RegionCode { get; set; }
         public string Name { get; set; }
         public double Area { get; set; }

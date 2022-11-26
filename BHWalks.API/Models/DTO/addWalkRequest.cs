@@ -1,6 +1,6 @@
 ﻿namespace BHWalks.API.Models.DTO
 {
-    public class addWalkRequest
+    public class AddWalkRequest
     {        
         public string Name { get; set; }
         public double Length { get; set; }
