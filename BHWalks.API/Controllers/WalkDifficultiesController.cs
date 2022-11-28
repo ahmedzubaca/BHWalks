@@ -1,7 +1,9 @@
 ﻿using BHWalks.API.Models.DTO;
 using BHWalks.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Data;
 
 namespace BHWalks.API.Controllers
 {
@@ -53,6 +55,7 @@ namespace BHWalks.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> AddWalkDiff(Models.DTO.AddWalkDiffRequest walkDiffRequest)
         {
             if(!ValidateWalkDifficultyModel(walkDiffRequest))
@@ -76,6 +79,7 @@ namespace BHWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> UpdateWalkDiff(Guid id, Models.DTO.AddWalkDiffRequest addWalkDiff)
         {   
             if(!ValidateWalkDifficultyModel(addWalkDiff))
@@ -102,6 +106,7 @@ namespace BHWalks.API.Controllers
 
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> DeleteWalkDiff(Guid id)
         {
             var deletedWalkDiff = await _walkDiffRepository.DeleteWalkDiff(id);

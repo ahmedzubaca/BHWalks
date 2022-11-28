@@ -2,8 +2,10 @@
 using BHWalks.API.Models.Domain;
 using BHWalks.API.Repositories;
 using BHWalks.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace BHWalks.API.Controllers
 {
@@ -51,6 +53,7 @@ namespace BHWalks.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> AddWalk(Models.DTO.AddWalkRequest addWalkRequest)
         {
             if (!await ValidateWalkModel(addWalkRequest))
@@ -88,6 +91,7 @@ namespace BHWalks.API.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> DeleteWalk(Guid id)
         {
             bool response = await _walksRepository.DeleteWalk(id);
@@ -100,6 +104,7 @@ namespace BHWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> UpdateWalk(Guid id, Models.DTO.AddWalkRequest walkRequest)
         {
             if (!await ValidateWalkModel(walkRequest))

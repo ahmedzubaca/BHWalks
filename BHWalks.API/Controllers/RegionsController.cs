@@ -2,6 +2,7 @@
 using BHWalks.API.Data;
 using BHWalks.API.Models.Domain;
 using BHWalks.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -13,6 +14,7 @@ namespace BHWalks.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    
     public class RegionsController : ControllerBase
     {
         private readonly IRegionsRepository _regionsRepository;
@@ -58,7 +60,7 @@ namespace BHWalks.API.Controllers
 
         [HttpGet]
         [Route("{id:guid}")]
-        [ActionName("GetRegionById")]
+        [ActionName("GetRegionById")]        
 
         public async Task<IActionResult> GetRegionById(Guid id)
         {
@@ -72,6 +74,7 @@ namespace BHWalks.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> AddRegion(Models.DTO.AddRegionRequest requestedRegion)
         {
             if (!ValidateRegionModel(requestedRegion))
@@ -111,6 +114,7 @@ namespace BHWalks.API.Controllers
 
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> DeleteRegion(Guid id)
         {
            var region = await _regionsRepository.DeleteRegion(id);
@@ -133,6 +137,7 @@ namespace BHWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> UpdateRegion(Guid id, Models.DTO.AddRegionRequest requestedRegion)
         {
             if(!ValidateRegionModel(requestedRegion))
